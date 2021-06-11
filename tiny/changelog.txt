@@ -1,0 +1,21 @@
+Changelog
+---------
+v. 1.02
+New: Multi-tabbed documents
++ added new property is_tabbed_document setting, available in advanced theme. If set to true (default) it enables multi-tabbed features for the editor content: users can now have multi-tabbed documents. Drawback: tab operations (create,change tab,delete) will reset the undo levels.
++ added file tab_rename_dialog.htm to handle user tab renamings.
++ added file helper_funcs.js to deal with the tabs and some other things.
++ added some lines to the language file ("en.tabs") to be used in the tab creation,renaming and deletion process.
++ added css for tabs in ui css files (under /* Document Multi-Tabs */ section)
+- some really small css files of plugins were integrated into each respective plugin's .htm file to reduce file clutter
+- all *_dlg.js files of plugins were integrated into advanced_dlg.js file to reduce file clutter and the calls to tinyMCEPopup.requireLangPack() were also updated to reflect this change.
+/ tiny_mce_popup.js requireLangPack() was also modified a bit to load the argument passed to it without appending "_dlg" string automatically.
+
+v. 1.00
+Initital release
+/ Some modifications to put all the files in a single folder. The search paths of skins, langs, themes and plugins were modified to search in the base path.
+/ theme languages were suffixed with the name of the theme (e.g. en_simple.js).
+/ skin css files were modified in a similar way: skins/default/content.css -> skin_default_content.css.
+/ In css files the path for every image was modified to search in the base path.
+/ tiny_mce.js (and tiny_mce_src.js) and tiny_mce_popup.js were modified to use the base path when searching for langs, themes, css and plugins.
+/ Some image files were modified to add more button possibilities or just to update some styles. 

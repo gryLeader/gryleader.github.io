@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>{#tabs.dlg_title}</title>
+	<script type="text/javascript" src="tiny_mce_popup.js"></script>
+	<script type="text/javascript" src="mctabs.js"></script>
+<style type="text/css">
+/* Custom styles for this dialog*/
+.panel_wrapper div.current {height:50px;}
+#new_name {width:95%}
+</style>	
+<script type="text/javascript">
+var reFocus = true;
+
+function initializeMe() {
+	//prepare input text with current tab value
+	var textArg = tinyMCEPopup.getWindowArg("curr_text_param");
+	if (textArg)	
+	    document.getElementById('new_name').value = textArg;	
+}
+
+//helper function for sanitizing strings
+function sanitizeMe(astring) {
+	
+	if (tinyMCEPopup.getWin().tinymce.isltIE9) {
+    //IE 8-7
+		var tagBody = '(?:[^"\'>]|"[^"]*"|\'[^\']*\')*';
+
+		var tagOrComment = new RegExp(
+			'<(?:'
+			// Comment body.
+			+ '!--(?:(?:-*[^->])*--+|-?)'
+			// Special "raw text" elements whose content should be elided.
+			+ '|script\\b' + tagBody + '>[\\s\\S]*?</script\\s*'
+			+ '|style\\b' + tagBody + '>[\\s\\S]*?</style\\s*'
+			// Regular name
+			+ '|/?[a-z]'
+			+ tagBody
+			+ ')>',
+			'gi');
+			
+		var oldHtml;
+		  do {
+			oldHtml = astring;
+			astring = astring.replace(tagOrComment, '');
+		    } while (astring !== oldHtml);
+		  return astring.replace(/</g, '&lt;');
+	}
+	else {	
+		var decoder = document.createElement('div');
+		decoder.innerHTML = astring;				
+		return decoder.textContent;		
+	}
+}
+
+function renameTab() {
+	var newname = document.getElementById('new_name').value;
+	
+	if (newname != null) {
+		newname = sanitizeMe(newname);
+	
+		if (newname.length >= 1 && newname.length <= 25) {	
+			
+			var tabArg = tinyMCEPopup.getWindowArg("sender_param");
+			var panelArg = tinyMCEPopup.getWindowArg("panel_param");
+									
+			var tab_elm = tinyMCEPopup.getWin().document.getElementById(tabArg);					
+			var panel_elm = tinyMCEPopup.getWin().document.getElementById('elm1_ifr').contentWindow.document.getElementById(panelArg);
+			
+			if (document.all && !document.querySelector) {
+				//IE7 no autoresize (min-width) of tabs so truncate title
+				if (newname.length > 9)				
+					tab_elm.children[0].children[0].innerHTML = newname.substring(0, 9) + "...";
+				else 
+					tab_elm.children[0].children[0].innerHTML = newname;
+			}
+			else {
+				tab_elm.children[0].children[0].innerHTML = newname;
+			}
+						
+			tab_elm.children[0].children[0].setAttribute('title', newname);
+			panel_elm.setAttribute('data-tabname', newname);
+			tinyMCEPopup.close();			
+		}
+		else {tinyMCEPopup.alert("Tab name must be between 1 to 25 characters in length.")}		
+	}
+}
+
+function lostFocus(elminput) {	
+	//hack to prevent input from loosing focus on popup show
+	if (reFocus) {
+		elminput.focus();
+		reFocus = false;		
+	}
+}
+</script>	
+</head>
+<body role="application" onload="initializeMe()">
+<form onsubmit="renameTab();return false;" action="#">
+	<div class="tabs">
+		<ul>
+			<li id="general_tab" class="current" aria-controls="general_panel"><span><a href="javascript:mcTabs.displayTab('general_tab','general_panel');" onmousedown="return false;">General</a></span></li>
+		</ul>
+	</div>
+
+	<div class="panel_wrapper">
+		<div id="general_panel" class="panel current">
+			<table role="presentation" border="0" cellpadding="4" cellspacing="0" style="width:100%">
+					<tr>
+						<td><label id="name_label">{#tabs.insert_new_name}</label></td>						
+					</tr>
+					<tr aria-labelledby="name_label">						
+						<td class="nowrap">
+							<input id="new_name" name="new_name" type="text" value="" onfocusout="lostFocus(this)" class="mceFocus"/>
+						</td>
+					</tr>					
+			</table>
+		</div>
+	</div>
+
+	<div class="mceActionPanel">
+		<input type="submit" id="insert" name="insert" value="{#apply}" />
+		<input type="button" id="cancel" name="cancel" value="{#cancel}" onclick="tinyMCEPopup.close();" />
+	</div>
+</form>
+</body>
+</html>
