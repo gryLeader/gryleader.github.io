@@ -175,16 +175,19 @@ function generateRndTabID(with_extra_letter) {
 function renameTabDlg(tabID,panelID) {
 
 	var panel_elm = tinymce.activeEditor.getDoc().getElementById(panelID); 
-			
-	tinyMCE.activeEditor.windowManager.open({
-		url:'tab_rename_dialog.htm',
-		width: 320,
-		height: 130,
-		inline : 1}, 
-	{
-		sender_param: tabID,
-		panel_param: panelID,
-		curr_text_param: panel_elm.getAttribute('data-tabname')});
+	
+	if (tinymce.settings.readonly != true) {	
+		tinyMCE.activeEditor.windowManager.open({
+			url:'tab_rename_dialog.htm',
+			width: 320,
+			height: 130,
+			inline : 1}, 
+		{
+			sender_param: tabID,
+			panel_param: panelID,
+			curr_text_param: panel_elm.getAttribute('data-tabname')});
+	}	
+		
 	return false;	
 }
 
@@ -253,7 +256,7 @@ function mceAddNewTab(selectAfterCreation) {
 		
 		x = getElementsByClassName("mceMultiTabContent", "div", tinymce.activeEditor.getDoc());
 		
-		x[x.length-1].insertAdjacentHTML('afterend', '<div id="' + panelID +'" class="mceMultiTabContent" data-tabname="'+ NewTabName +'"><p style="font-family: Verdana; font-size: 8pt">This is some example text.</p></div>');
+		x[x.length-1].insertAdjacentHTML('afterend', '<div id="' + panelID +'" class="mceMultiTabContent" data-tabname="'+ NewTabName +'"><p style="font-family: Verdana; font-size: 8pt">' + tinymce.activeEditor.getLang('tabs.initial_content') + '</p></div>');
 		
 		if (selectAfterCreation == true) {	
 			mceSelectTab(tabID , panelID);	
@@ -278,70 +281,84 @@ function mceLoadTabs(isEditorReadOnly) {
 			tabContainer.className = 'mceTabs ReadOnly';						
 		}
 	else {
-		row = table_el.insertRow(1); //if not in read only insert tabs below toolbar (pos 1)
+		row = table_el.insertRow(1); //if not in read only mode insert tabs container below the toolbar (pos 1)
 		row.className = 'mceTabsRow'; 		
 		tabContainer = row.insertCell(0);
 		tabContainer.className = 'mceTabs';
 	}	
 					
-	//for every mceMultiTabContent div create a tab and finally a +Create tab button	
+	//for every mceMultiTabContent panel div create a tab and finally a +Create tab button	
 	var tabs_str = '<div class="maintabswrapper" role="presentation"><ul>';
-	
+			
 	var panels, i;
-	panels = getElementsByClassName("mceMultiTabContent", "div", tinymce.activeEditor.getDoc());
+	panels = getElementsByClassName("mceMultiTabContent", "div", tinymce.activeEditor.getDoc());	
 	
-	//if there are content panels (mceMultiTabContent) then generate Tabs for each one of them	
-	if (panels && panels.length) {
+	//if no content panels (.mceMultiTabContent) probably a new document, surround the body contents with the html for the initial panel 
+	if (!panels.length) {
+		var body_content = tinymce.activeEditor.getBody();		
 		
-		for (i = 0; i < panels.length; i++) {
-			var tabClass = "",
-				tabID = "mceTab_" + panels[i].id.substr(12),
-				panelID = panels[i].id,
-				tab_panel_params = '\''+tabID+'\',\''+panelID+ '\'',
-				data_tabname = panels[i].getAttribute('data-tabname');				
-			
-			if (i == 0)
-				tabClass = "mtab current";
-			else 
-				tabClass = "mtab";				
-				
-			panels[i].className = "mceMultiTabContent hidden";
-			
-			tabs_str = tabs_str + '<li id="' + tabID + '" class="' + tabClass + '" oncontextmenu="javascript:renameTabDlg('+tab_panel_params+');return false;" onclick="javascript:mceSelectTab('+tab_panel_params+');return false;" ondblclick="javascript:renameTabDlg('+tab_panel_params+');return false;"><a href="javascript:;"><span class="tbtitle"  title="'+ data_tabname +'">'+ data_tabname +'</span>';
-						
-			if (!isEditorReadOnly)
-				tabs_str = tabs_str + '<span class="mceTabCloseIcon" title="'+DeleteTab+'" onclick="javascript:mceCloseTab('+ tab_panel_params +');return false;"></span>';
-			
-			tabs_str = tabs_str + '</a></li>'; 				
+		if (body_content.innerHTML.length < 9) {		 		
+			body_content.innerHTML = '<div id="mceTabPanel_I100" class="mceMultiTabContent" data-tabname="'+ tinymce.activeEditor.getLang('tabs.unnamed') +'"><p>' + tinymce.activeEditor.getLang('tabs.initial_content') + '</p>' + '</div>';
+		}		
+		else {
+			body_content.innerHTML = '<div id="mceTabPanel_I100" class="mceMultiTabContent" data-tabname="'+ tinymce.activeEditor.getLang('tabs.unnamed') +'">' +  body_content.innerHTML + '</div>';		
 		}
-		
-		//finally add + Create tab button if not in ReadOnly mode
-		if (!isEditorReadOnly)		
-			tabs_str = tabs_str + '<li class="addtab" title="'+CreateTabName +'" onclick="mceAddNewTab(true);return false;"><a href="javascript:;"><span class="addtabspan">+</span></a></li>';
-		
-		tabs_str = tabs_str + '</ul></div>';		
-		
-		tabContainer.insertAdjacentHTML('beforeend', tabs_str);		
-		
-		var tabslist = getElementsByClassName("mtab", "li");
-		
-		//select the first tab and panel
-		mceSelectTab(tabslist[0].id , panels[0].id);
+			
+		panels[0] = body_content.children[0];
 	}
+	
+	//for each panel present in the body generate a tab 	
+	for (i = 0; i < panels.length; i++) {
+		var tabClass = "",
+			tabID = "mceTab_" + panels[i].id.substr(12),
+			panelID = panels[i].id,
+			tab_panel_params = '\''+tabID+'\',\''+panelID+ '\'',
+			data_tabname = panels[i].getAttribute('data-tabname');				
+		
+		if (i == 0)
+			tabClass = "mtab current";
+		else 
+			tabClass = "mtab";				
+			
+		panels[i].className = "mceMultiTabContent hidden";
+		
+		tabs_str = tabs_str + '<li id="' + tabID + '" class="' + tabClass + '" oncontextmenu="javascript:renameTabDlg('+tab_panel_params+');return false;" onclick="javascript:mceSelectTab('+tab_panel_params+');return false;" ondblclick="javascript:renameTabDlg('+tab_panel_params+');return false;"><a href="javascript:;"><span class="tbtitle"  title="'+ data_tabname +'">'+ data_tabname +'</span>';
+					
+		if (!isEditorReadOnly)
+			tabs_str = tabs_str + '<span class="mceTabCloseIcon" title="'+DeleteTab+'" onclick="javascript:mceCloseTab('+ tab_panel_params +');return false;"></span>';
+		
+		tabs_str = tabs_str + '</a></li>'; 				
+	}
+	
+	//finally add + Create tab button if not in ReadOnly mode
+	if (!isEditorReadOnly)		
+		tabs_str = tabs_str + '<li class="addtab" title="'+CreateTabName +'" onclick="mceAddNewTab(true);return false;"><a href="javascript:;"><span class="addtabspan">+</span></a></li>';
+	
+	tabs_str = tabs_str + '</ul></div>';		
+	
+	tabContainer.insertAdjacentHTML('beforeend', tabs_str);		
+	
+	var tabslist = getElementsByClassName("mtab", "li");
+	
+	//select the first tab and panel
+	mceSelectTab(tabslist[0].id , panels[0].id);
+	
 }
 
 function updateTabs() {
-	var tabs_class = getElementsByClassName("mceMultiTabContent", "div", tinymce.activeEditor.getDoc());
+	//this function is also called in files: editor_template_advanced(_src).js
+	
+	var tabs_class = getElementsByClassName("mceMultiTabContent", "div", tinymce.activeEditor.getBody());
 	var tabbed_doc = tinymce.activeEditor.settings.is_tabbed_document;
 	
-	//remove existing tabs (not the content) before loading them again
+	//remove existing tabs row (not the content panels in the body) before loading them again
 	var table_el = tinymce.activeEditor.getContentAreaContainer().parentNode.parentNode;		
 	var rowdel = getElementsByClassName("mceTabsRow", "tr", table_el);		
 	if (rowdel.length) {
 		table_el.removeChild(rowdel[0]);		
 	}
-	//Load tabs if it was set on init settings, or if a div with the class used by the tabs is detected in the initial document
-	if (tabbed_doc || tabs_class) {				
+	//Load tabs if it was set on init settings (is_tabbed_document), or if a div with class mceMultiTabContent is detected in the body
+	if (tabbed_doc || tabs_class.length) {		
 		mceLoadTabs(tinymce.activeEditor.settings.readonly);
 	} 
 }

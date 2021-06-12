@@ -1,17 +1,24 @@
 Changelog
 ---------
-v. 1.02
+v. 1.0.3
+Some fixes related to tabs
+/ User can no longer open tab renaming dialog and change a tab's name when editor is in read only mode.
+/ Fix: The command to create a new document now removes all tabs and checks if is_tabbed_document setting was set in init, so creates an initial tab only if it should.
++ New translation variable added (tabs.initial_content) in file en.js allows to insert a predefined text (enclosed in p tags) in every newly created tab content.
+/ File helper_funcs.js was modified as part of these changes.
+
+v. 1.0.2
 New: Multi-tabbed documents
 + added new property is_tabbed_document setting, available in advanced theme. If set to true (default) it enables multi-tabbed features for the editor content: users can now have multi-tabbed documents. Drawback: tab operations (create,change tab,delete) will reset the undo levels.
-+ added file tab_rename_dialog.htm to handle user tab renamings.
++ added file tab_rename_dialog.htm to handle user tab renamings (on tab's double click or right-click).
 + added file helper_funcs.js to deal with the tabs and some other things.
 + added some lines to the language file ("en.tabs") to be used in the tab creation,renaming and deletion process.
 + added css for tabs in ui css files (under /* Document Multi-Tabs */ section)
-- some really small css files of plugins were integrated into each respective plugin's .htm file to reduce file clutter
-- all *_dlg.js files of plugins were integrated into advanced_dlg.js file to reduce file clutter and the calls to tinyMCEPopup.requireLangPack() were also updated to reflect this change.
+- some really small css files of plugins were integrated into each respective plugin's .htm file <head> section to reduce file clutter
+- all *_dlg.js files of plugins were integrated into advanced_dlg.js file to reduce file clutter, and the calls to tinyMCEPopup.requireLangPack() were also updated to reflect this change.
 / tiny_mce_popup.js requireLangPack() was also modified a bit to load the argument passed to it without appending "_dlg" string automatically.
 
-v. 1.00
+v. 1.0.0
 Initital release
 / Some modifications to put all the files in a single folder. The search paths of skins, langs, themes and plugins were modified to search in the base path.
 / theme languages were suffixed with the name of the theme (e.g. en_simple.js).

@@ -1485,8 +1485,10 @@
 			var ed = this.editor;
 
 			ed.windowManager.confirm('advanced.newdocument', function(s) {
-				if (s)
+				if (s) {
 					ed.execCommand('mceSetContent', false, '');
+					updateTabs(); //added 1.0.3					
+				}				
 			});
 		},
 
