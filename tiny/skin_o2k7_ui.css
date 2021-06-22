@@ -9,6 +9,7 @@
 /* Containers */
 .o2k7Skin table {background:transparent}
 .o2k7Skin iframe {display:block;}
+.o2k7Skin.fullscreen iframe {width:100%!important;height: 100%!important;background:#fff;}
 .o2k7Skin .mceToolbar {height:26px}
 
 /* Document Multi-Tabs */
@@ -55,10 +56,14 @@
 .o2k7Skin .mceExternalClose {position:absolute; top:3px; right:3px; width:7px; height:7px; background:url(icons.gif) -820px 0}
 
 /* Layout */
+.mceEditor.o2k7Skin.fullscreen {position: fixed;top: 0;width: 100%!important;height: 100%!important;}
 .o2k7Skin table.mceLayout {border:0;}
+.o2k7Skin.fullscreen table.mceLayout {height: 100%!important;width:100%!important;}
 .o2k7Skin table.mceLayout tr.mceLast td {border-bottom:1px solid #ABC6DD}
 .o2k7Skin table.mceToolbar, .o2k7Skin tr.mceFirst .mceToolbar tr td, .o2k7Skin tr.mceLast .mceToolbar tr td {border:0; margin:0; padding:0}
 .o2k7Skin .mceIframeContainer {border-bottom:1px solid #ABC6DD;border-top:none;}
+.o2k7Skin.fullscreen .mceIframeContainer {height: 100%;}
+
 .o2k7Skin td.mceToolbar{
 	background: #f1f4ff;
 	background: -moz-linear-gradient(top,  #f1f4ff 0%, #cbd7ff 47%, #ccd4ee 100%);
@@ -81,7 +86,10 @@
 	}
 .o2k7Skin .mceStatusbar div {float:left; padding:2px}
 .o2k7Skin .mceStatusbar a.mceResize {display:block; float:right; background:url(icons.gif) -800px 0; width:20px; height:20px; cursor:se-resize; outline:0}
+.o2k7Skin.fullscreen .mceStatusbar a.mceResize {display:none;}
 .o2k7Skin .mceStatusbar a:hover {text-decoration:underline}
+.o2k7Skin .mceStatusbar .word_count {float:right}
+.o2k7Skin.fullscreen .mceStatusbar .word_count {float:right;margin-right:7px;}
 .o2k7Skin table.mceToolbar {margin-left:3px}
 .o2k7Skin .mceToolbar .mceToolbarStart span {display:block; background:url(skin_o2k7_button_bg.png) -22px 0; width:1px; height:22px; margin-left:3px;}
 .o2k7Skin .mceToolbar td.mceFirst span {margin:0}
@@ -236,7 +244,6 @@
 .o2k7Skin .mce_backcolor span.mceAction {background-position:-760px 0}
 .o2k7Skin span.mce_forecolorpicker {background-position:-720px 0}
 .o2k7Skin span.mce_backcolorpicker {background-position:-760px 0}
-.o2k7Skin span.mce_latex {background-position:-841px -39px}
 
 /* Theme SimpleSkin*/
 .o2k7SimpleSkin span.mce_bold {background-position:0 0}
@@ -303,3 +310,4 @@
 .o2k7Skin span.mce_restoredraft {background-position:-20px -40px}
 .o2k7Skin span.mce_spellchecker {background-position:-540px -20px}
 .o2k7Skin span.mce_visualblocks {background-position: -40px -40px}
+.o2k7Skin span.mce_latex {background-position:-841px -39px}

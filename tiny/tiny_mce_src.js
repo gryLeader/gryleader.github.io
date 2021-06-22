@@ -1257,13 +1257,13 @@ tinymce.util.Quirks = function(editor) {
 	function inputMethodFocus() {
 		if (!editor.settings.content_editable) {
 			// Case 1 IME doesn't initialize if you focus the document
-			dom.bind(editor.getDoc(), 'focusin', function(e) {				
+			dom.bind(editor.getDoc(), 'focusin', function(e) {
 				selection.setRng(selection.getRng());
 			});
 
 			// Case 2 IME doesn't initialize if you click the documentElement it also doesn't properly fire the focusin event
 			dom.bind(editor.getDoc(), 'mousedown', function(e) {
-				if (e.target == editor.getDoc().documentElement) {										
+				if (e.target == editor.getDoc().documentElement) {
 					editor.getWin().focus();
 					selection.setRng(selection.getRng());
 				}
@@ -14232,13 +14232,13 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 
 			// Get start node
 			try {
-				node = selection.getStart() || self.getBody();				
+				node = selection.getStart() || self.getBody();
 			} catch (ex) {				
-				//exe mod IE volver a asignar el nodo si falló
+				//mod IE try to re-assign the node
 				node = isIE ? self.getBody() : node; 				
 			}			
 			if (node != null) {
-			node = isIE && node.ownerDocument != self.getDoc() ? self.getBody() : node; // Fix for IE initial state				
+			node = isIE && node.ownerDocument != self.getDoc() ? self.getBody() : node; // Fix for IE initial state
 			}			
 			
 			// Get parents and add them to object
@@ -14250,7 +14250,7 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 
 				o.parents.push(node);
 			});
-			//exe mod agregue el try catch
+			//mod added try-catch
 			try {
 			
 			self.onNodeChange.dispatch(
@@ -14634,7 +14634,7 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 			}
 
 			// Get raw contents or by default the cleaned contents
-			if (args.format == 'raw') {							
+			if (args.format == 'raw') {
 				content = body.innerHTML;
 			} else if (args.format == 'text') {
 				content = body.innerText || body.textContent;
@@ -14718,7 +14718,7 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 			else {					
 				return temporaryel;
 				}				
-			//modified fix			
+			//modified			
 		},
 
 		convertURL : function(url, name, elm) {

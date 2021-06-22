@@ -191,7 +191,7 @@
 			t.settings = s = extend({
 				theme_advanced_path : true,
 				theme_advanced_toolbar_location : 'top',
-				theme_advanced_blockformats : "p,address,pre,h1,h2,h3,h4,h5,h6",
+				theme_advanced_blockformats : "p,h1,h2,h3,h4,h5,h6,address,pre",
 				theme_advanced_toolbar_align : "left",
 				theme_advanced_statusbar_location : "bottom",
 				theme_advanced_fonts : "Andale Mono=andale mono,monospace;Arial=arial,helvetica,sans-serif;Arial Black=arial black,sans-serif;Book Antiqua=book antiqua,palatino,serif;Comic Sans MS=comic sans ms,sans-serif;Courier New=courier new,courier,monospace;Georgia=georgia,palatino,serif;Helvetica=helvetica,arial,sans-serif;Impact=impact,sans-serif;Symbol=symbol;Tahoma=tahoma,arial,helvetica,sans-serif;Terminal=terminal,monaco,monospace;Times New Roman=times new roman,times,serif;Trebuchet MS=trebuchet ms,geneva,sans-serif;Verdana=verdana,geneva,sans-serif;Webdings=webdings;Wingdings=wingdings,zapf dingbats",
@@ -776,13 +776,13 @@
 		resizeTo : function(w, h, store) {
 			var ed = this.editor, s = this.settings, e = DOM.get(ed.id + '_tbl'), ifr = DOM.get(ed.id + '_ifr');
 
-			// Boundery fix box
+			// Boundary fix box
 			w = Math.max(s.theme_advanced_resizing_min_width || 100, w);
 			h = Math.max(s.theme_advanced_resizing_min_height || 100, h);
 			w = Math.min(s.theme_advanced_resizing_max_width || 0xFFFF, w);
 			h = Math.min(s.theme_advanced_resizing_max_height || 0xFFFF, h);
 
-			// Resize iframe and container
+			// Resize iframe and container				
 			DOM.setStyle(e, 'height', '');
 			DOM.setStyle(ifr, 'height', h);
 
@@ -796,7 +796,7 @@
 					DOM.setStyle(ifr, 'width', e.clientWidth);
 				}
 			}
-
+			
 			// Store away the size
 			if (store && s.theme_advanced_resizing_use_cookie) {
 				Cookie.setHash("TinyMCE_" + ed.id + "_size", {
@@ -820,7 +820,7 @@
 			var t = this, ed = t.editor, lo = s.theme_advanced_toolbar_location, sl = s.theme_advanced_statusbar_location, n, ic, etb, c;
 
 			if (s.readonly) {
-				n = DOM.add(tb, 'tr');
+				n = DOM.add(tb, 'tr', {'class' : 'mceIframeRow'});
 				n = ic = DOM.add(n, 'td', {'class' : 'mceIframeContainer'});
 				return ic;
 			}
@@ -871,11 +871,11 @@
 			}
 
 			if (sl == 'top')
-				t._addStatusBar(tb, o);						
+				t._addStatusBar(tb, o);
 						
 			// Create iframe container
-			if (!s.theme_advanced_toolbar_container) {				
-				n = DOM.add(tb, 'tr');
+			if (!s.theme_advanced_toolbar_container) {
+				n = DOM.add(tb, 'tr', {'class' : 'mceIframeRow'});
 				n = ic = DOM.add(n, 'td', {'class' : 'mceIframeContainer'});
 			}
 
@@ -900,7 +900,7 @@
 
 				switch (c.toLowerCase()) {
 					case 'mceeditor':
-						n = DOM.add(tb, 'tr');
+						n = DOM.add(tb, 'tr', {'class' : 'mceIframeRow'});
 						n = ic = DOM.add(n, 'td', {'class' : 'mceIframeContainer'});
 						break;
 
@@ -978,7 +978,7 @@
 			a = s.theme_advanced_toolbar_align.toLowerCase();
 			a = 'mce' + t._ufirst(a);
 
-			n = DOM.add(DOM.add(c, 'tr', {role: 'presentation'}), 'td', {'class' : 'mceToolbar ' + a, "role":"toolbar"});
+			n = DOM.add(DOM.add(c, 'tr', {'class':'mceToolbarContainer', "role": 'presentation'}), 'td', {'class' : 'mceToolbar ' + a, "role":"toolbar"});
 
 			// Create toolbar and add the controls
 			for (i=1; (v = s['theme_advanced_buttons' + i]); i++) {
@@ -1007,7 +1007,7 @@
 		_addStatusBar : function(tb, o) {
 			var n, t = this, ed = t.editor, s = t.settings, r, mf, me, td;
 
-			n = DOM.add(tb, 'tr');
+			n = DOM.add(tb, 'tr', {'class' : 'mceStatusbarRow'});
 			n = td = DOM.add(n, 'td', {'class' : 'mceStatusbar'});
 			n = DOM.add(n, 'div', {id : ed.id + '_path_row', 'role': 'group', 'aria-labelledby': ed.id + '_path_voice'});
 			if (s.theme_advanced_path) {
@@ -1261,8 +1261,8 @@
 				getParent(function(n) {
 					var na = n.nodeName.toLowerCase(), u, pi, ti = '';
 
-					// Ignore non element and bogus/hidden elements
-					if (n.nodeType != 1 || na === 'br' || n.getAttribute('data-mce-bogus') || DOM.hasClass(n, 'mceItemHidden') || DOM.hasClass(n, 'mceItemRemoved'))
+					// Ignore non element, bogus/hidden elements and Tab Wrapper DIVs in the statusbar Path 
+					if (n.nodeType != 1 || na === 'br' || n.getAttribute('data-mce-bogus') || DOM.hasClass(n, 'mceMultiTabContent') || DOM.hasClass(n, 'mceItemHidden') || DOM.hasClass(n, 'mceItemRemoved'))
 						return;
 
 					// Handle prefix
@@ -1442,7 +1442,7 @@
 			ed.windowManager.open({
 				url : this.url + '/source_editor.htm',
 				width : parseInt(ed.getParam("theme_advanced_source_editor_width", (vpv.w / 1.3))),
-				height : parseInt(ed.getParam("theme_advanced_source_editor_height", (vpv.h / 1.2))),
+				height : parseInt(ed.getParam("theme_advanced_source_editor_height", (vpv.h / 1.3))),
 				inline : true,
 				resizable : true,
 				maximizable : true

@@ -20,7 +20,7 @@
 
 			t.countre = ed.getParam('wordcount_countregex', /[\w\u2019\u00co-\u00ff^\uc397^u00f7\'-]+/g); // u2019 == &rsquo; u00c0-u00ff extended latin chars with diacritical marks. exclude uc397 multiplication & u00f7 division
 			t.cleanre = ed.getParam('wordcount_cleanregex', /[0-9.(),;:!?%#$?\'\"_+=\\\/-]*/g);
-			t.update_rate = ed.getParam('wordcount_update_rate', 2000);
+			t.update_rate = ed.getParam('wordcount_update_rate', 3000);
 			t.update_on_delete = ed.getParam('wordcount_update_on_delete', false);
 			t.id = ed.id + '-word-count';
 
@@ -33,7 +33,7 @@
 					row = tinymce.DOM.get(ed.id + '_path_row');
 
 					if (row)
-						tinymce.DOM.add(row.parentNode, 'div', {'style': 'float: right'}, ed.getLang('wordcount.words', 'Words: ') + '<span id="' + t.id + '">0</span>');
+						tinymce.DOM.add(row.parentNode, 'div', {'class' : 'word_count'}, ed.getLang('wordcount.words', 'Words: ') + '<span id="' + t.id + '">0</span>');
 				} else {
 					tinymce.DOM.add(id, 'span', {}, '<span id="' + t.id + '">0</span>');
 				}
@@ -52,7 +52,8 @@
 			});
 
 			function checkKeys(key) {
-				return key !== last && (key === VK.ENTER || last === VK.SPACEBAR || checkDelOrBksp(last));
+				//return key !== last && (key === VK.ENTER || last === VK.SPACEBAR || checkDelOrBksp(last));
+				return key !== last && (last === VK.SPACEBAR || checkDelOrBksp(last));				
 			}
 
 			function checkDelOrBksp(key) {

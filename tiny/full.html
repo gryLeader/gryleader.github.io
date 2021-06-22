@@ -1,10 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <!-- (X-UA Edge will use the latest version available of IE) -->
 <meta http-equiv="cache-control" content="no-cache" />
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>Full featured example</title>
 
 <!-- TinyMCE Minified (production)-->
@@ -16,10 +16,11 @@
 <!--[if lte IE 7]>
 	<style type="text/css">
 	.maintabswrapper .mtab {width: 100px;}
+	html {overflow:hidden;}	
 	</style>      
 <![endif]-->
 <style type="text/css">
-a:focus {outline:0;} .anbtn {color: #333333; font-family: verdana, arial, geneva; font-size: 11px; float: left; text-decoration:none; padding: 3px 4px; margin: 5px 2px; border: 1px solid gray; border-radius:4px; background: #ededff;box-shadow: 1px 1px 1px #999999;} .anbtn:hover {background: #e3e3ff;box-shadow: 1px 1px 4px #666666;}
+a:focus {outline:0;} .anbtn {color: #333333; font-family: verdana, arial, geneva; font-size: 11px; float: left; text-decoration:none; padding: 3px 4px; margin: 5px 2px; border: 1px solid gray; border-radius:4px; background: #ededff;box-shadow: 1px 1px 1px #999999;} .anbtn:hover {background: #e3e3ff;box-shadow: 1px 1px 4px #6b6b6b;}
 </style>
 <script type="text/javascript">
 	tinyMCE.init({
@@ -39,20 +40,27 @@ a:focus {outline:0;} .anbtn {color: #333333; font-family: verdana, arial, geneva
 		skin : "o2k7",	//default
 		//skin_variant : "silver",		
 		plugins : "autolink, paste,advimage,lists,advlist,emotions,style,inlinepopups,table,advhr,contextmenu,autosave,directionality," +
-				"save,fullscreen,fullpage,pagebreak,preview,wordcount,layer,autoresize,noneditable,insertdatetime,searchreplace," +
+				"save,fullscreen,fullpage,pagebreak,preview,wordcount,layer,noneditable,insertdatetime,searchreplace," +
 				"print,media,visualblocks,xhtmlxtras,template,nonbreaking,latex",	
-				//bbcode, iespell
+				//bbcode, iespell, autoresize
 				
 		//language This option should contain a language code of the language pack to use with TinyMCE. These codes are in ISO-639-1 format.
-		//language : "nl"				
+		//language : "en"				
 
 		// Theme options
 		theme_advanced_buttons1 : "newdocument,save,|,restoredraft,|,preview,print,|,undo,redo,|,visualblocks,visualaid,pagebreak,nonbreaking,|,cite,abbr,acronym,del,ins,|,insertdate,inserttime,|,insertlayer,moveforward,movebackward,absolute,|,fullscreen,fullpage,cleanup,code,|,help",
 		theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,bullist,numlist,|,outdent,indent,blockquote,|,link,unlink,anchor,|,search,|,charmap,latex,emotions,image,media,|,tablecontrols",		
 		theme_advanced_buttons3 : "bold,italic,underline,forecolor,|,justifyleft,justifycenter,justifyright,justifyfull,|,formatselect,styleselect,fontselect,fontsizeselect,|,hr,advhr,|,removeformat,styleprops,attribs,backcolor,template",
 		//theme_advanced_buttons4 : "iespell,sub,sup,|, strikethrough,replace,ltr,rtl,visualchars",
-																		//setting added to create multi-tabbed documents.		
+				
+		//setting added to create multi-tabbed documents.		
 		is_tabbed_document : true,
+		
+		//If you set this option to true, the edit button will be disabled/dimmed until modifications are made.		
+		save_enablewhendirty : true,
+		
+		//This option enables you to add a custom function to be called when the save button/command is invoked.
+		save_onsavecallback : "mySave",		
 		
 		//theme_advanced_disable: "bold,italic",		
 		
@@ -65,6 +73,9 @@ a:focus {outline:0;} .anbtn {color: #333333; font-family: verdana, arial, geneva
 		
 		theme_advanced_resizing_use_cookie : false,
 				
+		//This option enables or disables the statusbar element path (set to true by default)		
+		//theme_advanced_path : false,
+				
 		//If you set this option to true, page contents will be stored away if the page is unloaded, for example if the user navigates away from the page and then navigated back to it 
 		add_unload_trigger: false,
 		
@@ -76,15 +87,13 @@ a:focus {outline:0;} .anbtn {color: #333333; font-family: verdana, arial, geneva
 		/*This option specifies the base URL for all relative URLs in the document. The default value is the directory of the current document. If a value is provided, it must specify a directory (not a document) and must end with a "/". */
 		//document_base_url : "http://www.site.com/path/",
 		
-		readonly : false,	
-
-		//auto_focus : "elm1",			
+		readonly : false,						
 		
 		//If you enable this feature, whitespace such as tabs and spaces will be preserved.
 		//preformatted : true,
 				
 		//restore draft plugin
-		//autosave_interval : '25s',
+		//autosave_interval : '30s',
 		//autosave_retention : '15m',
 		
 		//This option allows specification of the indentation level for indent/outdent buttons in the UI. This defaults to 30px but can be any value.
@@ -119,6 +128,8 @@ a:focus {outline:0;} .anbtn {color: #333333; font-family: verdana, arial, geneva
 		paste_retain_style_properties: 'font-size,font-family,color,text-align',
 		paste_remove_styles_if_webkit: false,
 
+		//word counter plugin update milliseconds rate  		
+		wordcount_update_rate : 2500,								
 		
 		//force all menus to be constrained to the current view port.		
 		//constrain_menus : true,
@@ -151,6 +162,9 @@ a:focus {outline:0;} .anbtn {color: #333333; font-family: verdana, arial, geneva
 		
 		oninit : myCustomOnInit,
 		
+		//This option enables you to auto focus an editor instance. The value of this option should be an editor instance id.
+		auto_focus : "elm1",
+		
 		//This option should contain a function name to be executed each time a editor instance is initialized. 
 		//init_instance_callback : "myCustomInitInstance",	
 		
@@ -163,8 +177,8 @@ a:focus {outline:0;} .anbtn {color: #333333; font-family: verdana, arial, geneva
 				
 		file_browser_callback : 'myFileBrowser',	
 		
-		//This option is considered deprecated.
-		//save_callback : "myCustomSaveContent",		 
+		//This option is considered deprecated. Use the new Event API
+		//save_callback : "myCustomSaveContent",
 
 		// Replace values for the template plugin
 		template_replace_values : {
@@ -175,16 +189,18 @@ a:focus {outline:0;} .anbtn {color: #333333; font-family: verdana, arial, geneva
 	
 function myFileBrowser (field_name, url, type, win) {
   
-  //alert("Field_Name: " + field_name + " nURL: " + url + " nType: " + type + " nWin: " + win); // debug/testing 
-  
-  alert("file browse button clicked.");  
-  //open some browser to search for file
-      
+  //alert("Field_Name: " + field_name + " nURL: " + url + " nType: " + type + " nWin: " + win); // debug/testing   
+  tinymce.activeEditor.windowManager.alert("File Browse button clicked.");  
+  //open some browser to search for file      
 } 
 
 function myCustomOnInit() {
         //alert("We are ready to rumble!");
 		updateTabs();
+}
+function mySave() {
+	//Gets called when save button is clicked
+	tinymce.activeEditor.windowManager.alert("Save clicked!\nPerform some action..");			
 }
 </script>
 <!-- /TinyMCE -->
@@ -202,7 +218,7 @@ function myCustomOnInit() {
 			<div> 			
 			<!-- Gets replaced with TinyMCE, remember HTML in a textarea should be encoded -->
 				<div><textarea id="elm1" name="elm1" rows="15" cols="80" style="width: 100%">									
-					&lt;div id="mceTabPanel_I100" class="mceMultiTabContent" data-tabname="Tab 1"&gt;&lt;p&gt;
+					&lt;p&gt;
 						This is some example text that you can edit inside the &lt;strong&gt;TinyMCE editor&lt;/strong&gt;.
 					&lt;/p&gt;
 					&lt;p&gt;
@@ -215,7 +231,7 @@ function myCustomOnInit() {
 							&lt;tr&gt;&lt;td&gt;a&lt;/td&gt;&lt;td style="font-family: Arial Black; font-size: 28pt"&gt;b&lt;/td&gt;&lt;/tr&gt;
 							&lt;tr&gt;&lt;td&gt;c&lt;/td&gt;&lt;td&gt;d&lt;/td&gt;&lt;/tr&gt;
 						&lt;/tbody&gt;
-					&lt;/table&gt;&lt;/div&gt;
+					&lt;/table&gt;
 				</textarea></div>
 			</div>			
 		</div>		
@@ -230,26 +246,30 @@ function myCustomOnInit() {
 		<a href="javascript:;" class="anbtn" onclick="alert(tinyMCE.get('elm1').selection.getNode().nodeName);return false;">Get selected element</a>
 		<a href="javascript:;" class="anbtn" onclick="tinyMCE.execCommand('mceInsertContent',false,'<b>Hello world!!</b>');return false;">Insert HTML</a>
 		<a href="javascript:;" class="anbtn" onclick="tinyMCE.execCommand('mceReplaceContent',false,'<b>{$selection}</b>');return false;">Replace selection</a>
+		<a href="javascript:;" class="anbtn" onclick='tinyMCE.execCommand("mceReplaceContent",false,"<span class=\"customclass\">{$selection}</span>");return false;'>Enclose selection with class</a>		
 		<a href="javascript:;" class="anbtn" onclick="tinymce.activeEditor.undoManager.clear();tinyMCE.execCommand('mceRepaint');return false;">ClearUndoLevels</a>
-		<a href="javascript:;" class="anbtn" onclick="mceAddNewTab(true);return false;">New Tab</a>		
-		<a href="javascript:;" class="anbtn" onclick="tinyMCE.get('elm1').setProgressState(true);return false;">Set ProgressState</a>	
+		<a href="javascript:;" class="anbtn" onclick="mceAddNewTab(true);return false;">New Tab</a>
+		<a href="javascript:;" class="anbtn" onclick="tinyMCE.get('elm1').setProgressState(true);return false;">Set ProgressState On</a>
+		<a href="javascript:;" class="anbtn" onclick="tinyMCE.activeEditor.setProgressState(false);tinyMCE.activeEditor.focus();return false;">Set ProgressStateOff</a>		
 		<a href="javascript:;" class="anbtn" onclick="alert(tinyMCE.get('elm1').isDirty());return false;">IsDirty?</a>
 		<a href="javascript:;" class="anbtn" onclick="tinyMCE.get('elm1').isNotDirty = true;return false;">SetIsNotDirty</a>
 		<a href="javascript:;" class="anbtn" onclick="tinyMCE.execCommand('mceSetContent',false,'<b>Hello world!!</b>');updateTabs();return false;">mceSetContent</a>
-		<a href="javascript:;" class="anbtn" onclick="tinyMCE.get('elm1').setContent('hello world');updateTabs();return false;">Set content</a>	
+		<a href="javascript:;" class="anbtn" onclick="tinyMCE.get('elm1').setContent('hello world');updateTabs();return false;">Set content</a>
+		<a href="javascript:;" class="anbtn" onclick="setCaretToPara(tinyMCE.activeEditor, false, true);return false;">Set Caret To Paragraph</a>	
 		<a href="javascript:;" class="anbtn" onclick="tinyMCE.activeEditor.windowManager.alert('Hello world!');return false;">testAlert</a>
 		<a href="javascript:;" class="anbtn" onclick="tinyMCE.activeEditor.windowManager.confirm('Are you sure to proceed?');return false;">testConfirm</a>
 		<a href="javascript:;" class="anbtn" onclick="allEditorsReadOnly();return false;">Switch Read Only/Editable</a>		
 		<br />
-		<div style="clear:both;margin:10px 0;"></div>		
+		<div style="clear:both;margin:10px 0;"></div>
 	</div>		
 	</div>
 </form>
 
 <script type="text/javascript">
 //Call some function before leaving the page?
-window.onbeforeunload = function(){};
+window.onbeforeunload = function(){
 window.focus();
+};
 </script>
 </body>
 </html>

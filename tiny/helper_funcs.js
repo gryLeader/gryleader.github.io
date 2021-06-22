@@ -88,18 +88,101 @@ function stopPropagation(evt) {
     }
 }
 
+//Caret positioning manipulation
+function setCaretToElem(a_editor, a_element, at_start) {
+	var doc = a_editor.getDoc();
+	if (at_start == "undefined")
+		at_start = false;
+	if (a_element) {			
+		if (typeof doc.createRange != "undefined") {
+			//IE 9+
+			var range = doc.createRange();
+			range.selectNodeContents(a_element);
+			range.collapse(at_start);
+			var win = doc.defaultView || doc.parentWindow;
+			var sel = win.getSelection();
+			sel.removeAllRanges();
+			sel.addRange(range);
+		} else if (typeof doc.body.createTextRange != "undefined") {
+			//IE 7-8
+			var textRange = doc.body.createTextRange();
+			textRange.moveToElementText(a_element);
+			textRange.collapse(at_start);
+			textRange.select();
+		}	
+	}
+}
+function setCaretToPara(a_editor, last_para, at_start) {
+	var a_element;
+	var doc = a_editor.getDoc();
+	if (last_para == "undefined")
+		last_para = false;	
+	if (at_start == "undefined")
+		at_start = false;
+		
+	var tabs_class = getElementsByClassName("mceMultiTabContent", "div", a_editor.getBody());
+	var tabbed_doc = a_editor.settings.is_tabbed_document;
+
+	if (tabbed_doc || tabs_class.length) {
+		var tabs = getElementsByClassName("mtab current", "LI");
+		if (tabs.length) {
+			var panelID = "mceTabPanel_" + tabs[0].id.substr(7);
+			a_element = a_editor.getDoc().getElementById(panelID);	 //get tab panel DIV			
+		}
+	}	else {
+			a_element = a_editor.getBody(); //get BODY
+	}
+	
+	var p_tags = a_element.getElementsByTagName("P").length;
+	
+	if (p_tags) {		
+		if (last_para) {
+			a_element = a_element.getElementsByTagName("P")[p_tags-1];
+		} else {
+			a_element = a_element.getElementsByTagName("P")[0];
+		}	
+	} else {	
+		//if there are no paragraphs to put the caret on, create a blank paragraph and place caret there
+		var para = a_editor.getDoc().createElement("P");
+		
+		if (last_para) {			 
+			a_element.appendChild(para);			
+			a_element = para;					
+		} else {
+			a_element.insertBefore(para, a_element.children[0]);		
+			a_element = para;			
+		}		
+	}	
+	
+	if (typeof doc.createRange != "undefined") {
+		//IE 9+
+		var range = doc.createRange();
+		range.selectNodeContents(a_element);
+		range.collapse(at_start);
+		var win = doc.defaultView || doc.parentWindow;
+		var sel = win.getSelection();
+		sel.removeAllRanges();
+		sel.addRange(range);
+	} else if (typeof doc.body.createTextRange != "undefined") {
+		//IE 7-8
+		var textRange = doc.body.createTextRange();
+		textRange.moveToElementText(a_element);
+		textRange.collapse(at_start);
+		textRange.select();
+	}
+}
+
 //Run-Time set all editors to read-only mode
 function allEditorsReadOnly() {
-	//Hack to set read only at run-time (for TinyMCE 3.x)
-	//to do: use activeEditor instead of hardcode editor elm1, elmx.. instances
-	var editorsfound, i, x, eds, readonly_prop, prev_settings;
+	//Hack to set read only at run-time (for TinyMCE 3.x)	
+	var editorsfound, i, eds, readonly_prop, prev_settings;
 	editorsfound = getElementsByClassName('mceEditor');
-	readonly_prop = 0;
-	i = 1;	
+	//array of editors: 1) tinymce.EditorManager.editors 2) getElementsByClassName('mceEditor')
+	
+	readonly_prop = 0;		
 		
 	if (editorsfound) {		
-		eds = tinymce.EditorManager.editors.length;
-		
+		eds = tinymce.EditorManager.editors.length;		
 		readonly_prop = tinymce.activeEditor.settings.readonly;
 		prev_settings = tinymce.activeEditor.settings;
 		if (readonly_prop == 'undefined') {
@@ -110,9 +193,11 @@ function allEditorsReadOnly() {
 			readonly_prop = !readonly_prop //alternate on/off
 		}
 		//now set all editors with the new read only property
-		for (x = 1; x < eds +1; x++) {
-			tinymce.EditorManager.execCommand('mceRemoveControl', false, 'elm'+x);
-			//tinyMCE.execCommand('mceRemoveControl', false, 'elm'+x);			
+		for (i = 0; i < eds; i++) {
+			var ed_id = tinymce.EditorManager.editors[i].id;
+			
+			tinymce.EditorManager.execCommand('mceRemoveControl', false, ed_id);
+			//tinyMCE.execCommand('mceRemoveControl', false, ed_id);			
 			tinymce.settings = prev_settings;			
 			tinymce.settings.readonly = readonly_prop;
 					
@@ -122,7 +207,7 @@ function allEditorsReadOnly() {
 				else {
 					tinymce.settings.visual = true;								
 				}	
-			tinyMCE.EditorManager.execCommand('mceAddControl', false, 'elm'+x); 
+			tinyMCE.EditorManager.execCommand('mceAddControl', false, ed_id); 
 
 			//Re-Load Tabs
 			if (tinymce.settings.is_tabbed_document) {
@@ -135,7 +220,7 @@ function allEditorsReadOnly() {
 //Multi-Tab Document related functions
 function mceSelectTab(a_tab_id, a_panel_id) {
 		
-	// first of all we get all tab content blocks (I think the best way to get them by class names)
+	// first of all get all tab content blocks (I think the best way to get them by class names)
 	//(done like this for compatibility with IE6-7)	
 	var x, i;
 	x = getElementsByClassName("mceMultiTabContent", "div", tinymce.activeEditor.getDoc());
@@ -155,10 +240,12 @@ function mceSelectTab(a_tab_id, a_panel_id) {
 	}	
 	document.getElementById(a_tab_id).className = "mtab current";
 		
-	//reset undo levels to avoid  breaking the document
+	//reset undo levels to avoid breaking the document if undo is pressed
 	tinymce.activeEditor.undoManager.clear();
 	tinymce.activeEditor.undoManager.add();
 	tinymce.activeEditor.execCommand('mceRepaint');
+		
+	setCaretToPara(tinymce.activeEditor, false, true);	
 }
 
 function generateRndTabID(with_extra_letter) {
@@ -295,13 +382,20 @@ function mceLoadTabs(isEditorReadOnly) {
 	
 	//if no content panels (.mceMultiTabContent) probably a new document, surround the body contents with the html for the initial panel 
 	if (!panels.length) {
-		var body_content = tinymce.activeEditor.getBody();		
+		var body_content = tinymce.activeEditor.getBody();
+		
+		var	rnd_ID = generateRndTabID();
+		//if element ID already existed create new random name with an extra-letter to avoid repetition
+		if (tinymce.activeEditor.getDoc().getElementById(rnd_ID)) {
+			rnd_ID = generateRndTabID(true);
+		}
+		
 		
 		if (body_content.innerHTML.length < 9) {		 		
-			body_content.innerHTML = '<div id="mceTabPanel_I100" class="mceMultiTabContent" data-tabname="'+ tinymce.activeEditor.getLang('tabs.unnamed') +'"><p>' + tinymce.activeEditor.getLang('tabs.initial_content') + '</p>' + '</div>';
+			body_content.innerHTML = '<div id="mceTabPanel_' + rnd_ID +'" class="mceMultiTabContent" data-tabname="'+ tinymce.activeEditor.getLang('tabs.unnamed') +'"><p>' + tinymce.activeEditor.getLang('tabs.initial_content') + '</p>' + '</div>';
 		}		
 		else {
-			body_content.innerHTML = '<div id="mceTabPanel_I100" class="mceMultiTabContent" data-tabname="'+ tinymce.activeEditor.getLang('tabs.unnamed') +'">' +  body_content.innerHTML + '</div>';		
+			body_content.innerHTML = '<div id="mceTabPanel_' + rnd_ID +'" class="mceMultiTabContent" data-tabname="'+ tinymce.activeEditor.getLang('tabs.unnamed') +'">' +  body_content.innerHTML + '</div>';		
 		}
 			
 		panels[0] = body_content.children[0];
@@ -338,7 +432,7 @@ function mceLoadTabs(isEditorReadOnly) {
 	
 	tabContainer.insertAdjacentHTML('beforeend', tabs_str);		
 	
-	var tabslist = getElementsByClassName("mtab", "li");
+	var tabslist = getElementsByClassName("mtab", "li");		
 	
 	//select the first tab and panel
 	mceSelectTab(tabslist[0].id , panels[0].id);
@@ -348,17 +442,17 @@ function mceLoadTabs(isEditorReadOnly) {
 function updateTabs() {
 	//this function is also called in files: editor_template_advanced(_src).js
 	
-	var tabs_class = getElementsByClassName("mceMultiTabContent", "div", tinymce.activeEditor.getBody());
+	var tabs_content_class = getElementsByClassName("mceMultiTabContent", "div", tinymce.activeEditor.getBody());
 	var tabbed_doc = tinymce.activeEditor.settings.is_tabbed_document;
 	
-	//remove existing tabs row (not the content panels in the body) before loading them again
+	//remove existing tabs row (not the content panels in the body) before loading them again (required for read-only switch)
 	var table_el = tinymce.activeEditor.getContentAreaContainer().parentNode.parentNode;		
 	var rowdel = getElementsByClassName("mceTabsRow", "tr", table_el);		
 	if (rowdel.length) {
 		table_el.removeChild(rowdel[0]);		
 	}
-	//Load tabs if it was set on init settings (is_tabbed_document), or if a div with class mceMultiTabContent is detected in the body
-	if (tabbed_doc || tabs_class.length) {		
+	//Load tabs if it was set on init settings (is_tabbed_document), or if a div with class mceMultiTabContent is found in the body
+	if (tabbed_doc || tabs_content_class.length) {		
 		mceLoadTabs(tinymce.activeEditor.settings.readonly);
 	} 
 }
