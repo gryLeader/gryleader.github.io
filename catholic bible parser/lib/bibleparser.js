@@ -1,8 +1,7 @@
 /* 
 Catholic Bible Parser 1.0.0 by Ezequiel Mayan
 July 05, 2021
-
-License: MIT (Open Source)
+https://github.com/gryLeader/Catholic-Bible-Reference-Parser/
  */ 
  
 //Constructor BibleParser()
@@ -234,9 +233,8 @@ function BibleParser() {
 		var toberemoved = false;
 				
 		for (var i = candidates.length -1; i >= 0 ; i--) {
-			if (candidates[i].addendum != undefined) {
-			
-				//var extras = candidates[i].addendum.split(/(?:[\.,\-a-d]?(\d{1,3}))+/g);
+			if (candidates[i].addendum != undefined) {			
+				
 				var extras = candidates[i].addendum.split(/(?:[a-d.,\-])+/g);
 								
 				for (var b = 0; b < extras.length ; b++) {
