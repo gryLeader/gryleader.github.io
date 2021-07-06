@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8" />
+<style type="text/css">
+html, p {font-family:verdana,arial,sans-serif;font-size:12px;}
+html, body {height:100%;}
+a {cursor:pointer;font-size:11px;color:#253f8b;font-family:verdana,arial,sans-serif;border:1px solid #00238c;background:#eef3f9;padding:3px 14px;border-radius:5px;}
+a:hover {background:#c9d9eb;box-shadow:0 1px 2px #999999;font-style:italic;}
+.bibleref {background-color:#f4fbf8;font-style:italic;border-bottom:1px dashed #132353;}
+.bibleref:hover {background-color:#d5fdee;border-bottom:1px dotted #16285f;font-style:normal;cursor:pointer;}
+</style>
+
+<script type="text/javascript" src="biblebooks.js"></script>
+<script type="text/javascript" src="bibleparser.js"></script>
+
+<script type="text/javascript">
+//Simply adds a .bibleref css class to highlight references found in parsed text
+function addInlineStylePos(str,pos1,pos2) {
+	var classprefix = 	'<span class="bibleref">',
+	classsufix = 		'</span>';	
+
+    if(pos1 > str.length-1) 
+		return str;    
+	return  str.substring(0,pos1) + classprefix + str.substring(pos1,pos2) + classsufix + str.substring(pos2);	
+}
+
+//this func just prints out results of parsing, nothing interesting..
+function highlightMatches(validated_refs) {
+	var htmlText = document.getElementById("para1").innerHTML;
+		
+	var tempsum = 0;		
+		
+	for (var i = 0; i < validated_refs.length; i++) {	
+		
+		var posvalue = validated_refs[i].pos; //e.g. 3-12
+		posvalue = posvalue.split('-');
+		htmlText = addInlineStylePos(htmlText, Number(posvalue[0]) + tempsum, Number(posvalue[1]) + tempsum); 
+		tempsum = tempsum + 30;	//account for new characters added for the class inserted by addInlineStylePos()			
+	}	
+					
+	document.getElementById("para1").innerHTML = htmlText;
+}
+
+function main(astring, vtype) {
+	if (vtype == undefined)
+		var vtype = "bcv";
+	
+	var bp = new BibleParser();	
+	
+	var t0, t1;
+	if (typeof performance.now !== "undefined")
+			t0 = performance.now();
+		else
+			t0 = new Date().getTime();			
+	
+	bp.parseText(astring, vtype);		
+	
+	if (typeof performance.now !== "undefined")
+			t1 = performance.now();
+		else
+			t1 = new Date().getTime();
+						
+	if (bp.hasRefs()) {
+		highlightMatches(bp.validRefs);
+		document.getElementById("para2").innerHTML = bp.logRefs();		
+	}			
+	
+	document.getElementById("time").innerHTML = '* Time: ' + Math.round((t1 - t0)*100)/100 + ' ms.';	
+}
+
+//helper functions for the demo web
+function reset() {
+
+  var para = document.getElementById("para1");
+
+  para.innerHTML = 'textContent' in para ? para.textContent: para.innerText;
+  document.getElementById("para2").innerHTML = ""; 
+  document.getElementById("time").innerHTML = "* Time: 0 ms";  
+}
+function insertnew() {
+	reset();
+	var newref = document.getElementById("textarea1").value;
+
+	var para = document.getElementById("para1");
+	para.innerHTML = 'textContent' in para ? para.textContent + newref: para.innerText + newref;
+}
+
+</script>
+</head>
+<body>
+	<h2>Catholic Bible Reference Parser - Scripture Recognition Demo</h2>
+	<p style="font-size:11px;color:#444444;">This demo demonstrates recognizing of catholic bible references (73 books) in english and spanish language.<br>Note: The demo and the functions SUPPORT IE6+ (Wide browser compatibility).<br>To Use just press the Parse text button. You may also want to add your own references in the text area below for testing.
+	</p>	
+	<div style="margin:10px 0;width:100%">	
+		<p id="time" style="float:right;font-weight:bold;margin:0 15px 10px 0">* Time: 0 ms</p>
+		<p id="para1" style="padding:9px;clear:both;width:99%;line-height:20px;">Gen2:21; Gen 24:34-37.38.56ab; (2 Mac. 15:36) Genesis 1:6,9-10. My friend is 5 years old, is. 5 Is 5 is 5:1 Is.4 Is. 3; Is 7:13 Hec_1:15-17.21.22) Mar 3:24 Mc 9:10a-34.36a.38c.50a r 1 Cr. 12:4 1Cr. 12:5  1Cr 13:6  1Cr. 14:15-16  1Cr. 15,17-23  Mt3,16 Mt. 5,16-18 Mt. 5,16-12 Mt.5,16ab (Mt. 5, 16a-18ab) 1st. Cor 3:21; 3° Jn. 1:13	2 Cr. 3:10 2Cr. 3,10 er6565 yretyer 42423 The 10 commandments are awesome. mt 11:15 lc 4:1-23 Gen 24:25-31.33.35 Jn. 4:15-19; 5 Jn.3:27 3 Mt. 3:12,14,15 Tr. 3:5.7b Am. 1:12 Deut 6 2 Lev. 6, 29 1ra Tes 3:13 (spanish) 1st Thes 1:7 1Thes 3:02 Mk. 3-9; Song 2:4-6 Cantar 2:4-7. 
+		</p>
+		<p style="font-size:10px;color:#444444;font-style:italic;">* Time in milliseconds is calculated on Bible Reference Parser functions only, excluding operations executed later to show the results.
+		</p>
+	</div>
+	<div style="clear:both;margin:12px 6px;">
+		<a onclick="main(document.getElementById('para1').innerHTML, 'bcva')">Parse text!</a>
+		<a onclick="reset()">Reset</a>	
+		<p id="para2" style="color:#444444;font-size:11px;"></p>
+		<div style="clear:both;margin:6px 0;">
+		<textarea id="textarea1" style="display:block;clear:both;height:40px;width:90%;margin:10px 0 0;">Insert references for testing here..
+		</textarea>
+		</div>
+		<div style="clear:both;margin:6px 0;padding:10px 0;">	
+		<a style="margin:6px 0;" onclick="insertnew()">Insert new reference</a>	
+		</div>
+	</div>
+</body>
+</html>
