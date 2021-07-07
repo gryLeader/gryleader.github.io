@@ -23,9 +23,9 @@ function BibleParser() {
 			"bookID": undefined,							//(temporary, gets defined later by validation function)		
 			"book": match[2],								//Sam (temporary value, gets re-defined later by validation function)
 			"bookshort": undefined,							//(temporary, gets defined later by validation function)
-			"chapter": match[3],							//2
-			"verse": match[4],								//17
-			"rangeto": match[5],							//24ab
+			"chapter": match[3].replace(/^0+/, ''),			//2
+			"verse": match[4].replace(/^0+/, ''),			//17
+			"rangeto": match[5].replace(/^0+/, ''),			//24ab
 			"addendum": match[6] || match[7]				//.25,27-29a  
 		}
 		
@@ -286,13 +286,14 @@ function BibleParser() {
   this.logRefs = function() {
 	if (this.hasRefs()) {
 		
-		var parsedResult;					
+		var parsedResult, bookprefixnum;					
 		
 		parsedResult = this.validRefs.length + ' biblical refs have been found:' + '<br>';
 			
 		for (var i = 0; i < this.validRefs.length; i++) {		
+			bookprefixnum =	this.validRefs[i].prefix ? ', prefix: ' + this.validRefs[i].prefix : '';		
 			
-			parsedResult += i+1 + ': pos: ' + this.validRefs[i].pos + ', ref: ' + this.validRefs[i].ref + ', bookID: ' + this.validRefs[i].bookID + ', book: ' + this.validRefs[i].book  + ', bookshort: ' + this.validRefs[i].bookshort + ', chapter: ' + this.validRefs[i].chapter;
+			parsedResult += i+1 + ': pos: ' + this.validRefs[i].pos + ', ref: ' + this.validRefs[i].ref + ', bookID: ' + this.validRefs[i].bookID +bookprefixnum + ', book: ' + this.validRefs[i].book  + ', bookshort: ' + this.validRefs[i].bookshort + ', chapter: ' + this.validRefs[i].chapter;
 			
 			if (this.validRefs[i].verse)
 				parsedResult +=  ', verse: ' + this.validRefs[i].verse;
