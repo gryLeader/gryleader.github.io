@@ -23,9 +23,9 @@ function BibleParser() {
 			"bookID": undefined,							//(temporary, gets defined later by validation function)		
 			"book": match[2],								//Sam (temporary value, gets re-defined later by validation function)
 			"bookshort": undefined,							//(temporary, gets defined later by validation function)
-			"chapter": match[3].replace(/^0+/, ''),			//2
-			"verse": match[4].replace(/^0+/, ''),			//17
-			"rangeto": match[5].replace(/^0+/, ''),			//24ab
+			"chapter": match[3],							//2
+			"verse": match[4],								//17
+			"rangeto": match[5],							//24ab
 			"addendum": match[6] || match[7]				//.25,27-29a  
 		}
 		
@@ -34,6 +34,13 @@ function BibleParser() {
 			refObject.ref = refObject.ref.slice(0, -1);
 			refObject.pos = match.index + '-' + (bigRegex.lastIndex -1);			
 		}
+		
+		if (refObject.chapter)
+			refObject.chapter = refObject.chapter.replace(/^0+/, '');
+		if (refObject.verse)
+			refObject.verse = refObject.verse.replace(/^0+/, '');
+		if (refObject.rangeto)
+			refObject.rangeto = refObject.rangeto.replace(/^0+/, '');		
 		
 		matches.push(refObject);			
 				
