@@ -8,7 +8,8 @@ https://github.com/gryLeader/Catholic-Bible-Reference-Parser/
 function BibleParser() {  
   this.validRefs = [];   
   this.allowsections = false;   
-  
+  this.vtype = "bcv";
+  this.locale = "en";  
   this.grabCandidates = function(astring) {
     var match, 
 		matches = [];
@@ -51,7 +52,9 @@ function BibleParser() {
 	
 	var book_found, removed,
 		aliases = window.bp_bookAliases, //defined in file biblebooks.js
-		booksinfo = window.bp_booksInfo;	
+		booksinfo = window.bp_booksInfo, //defined in file biblebooks.js
+		normalizedNames = window.bp_normalizedNames; //defined in file biblebooks.js
+		
 	
 	//validate refs based on book name against the aliases string with this regex	
 	for (var i = candidates.length -1; i >= 0 ; i--) {
@@ -90,7 +93,7 @@ function BibleParser() {
 							candidates.splice(i, 1);	
 							removed = true;	}						
 						break;
-					case 'd*':
+					case 'd*': //1 Maccabees 2 Maccabees
 						if (candidates[i].prefix == '1')
 							candidates[i].bookID = 20;
 						else if (candidates[i].prefix == '2')
@@ -99,7 +102,7 @@ function BibleParser() {
 							candidates.splice(i, 1);	
 							removed = true;	}						
 						break;
-					case 'e*':
+					case 'e*': //1 Corinthians 2 Corinthians
 						if (candidates[i].prefix == '1')
 							candidates[i].bookID = 53;
 						else if (candidates[i].prefix == '2')
@@ -108,7 +111,7 @@ function BibleParser() {
 							candidates.splice(i, 1);	
 							removed = true;		}					
 						break;
-					case 'f*':
+					case 'f*': //1 Thessalonians 2 Thessalonians
 						if (candidates[i].prefix == '1')
 							candidates[i].bookID = 59;
 						else if (candidates[i].prefix == '2')
@@ -117,7 +120,7 @@ function BibleParser() {
 							candidates.splice(i, 1);	
 							removed = true;		}					
 						break;
-					case 'g*':
+					case 'g*': //1 Timothy 2 Timothy
 						if (candidates[i].prefix == '1')
 							candidates[i].bookID = 61;
 						else if (candidates[i].prefix == '2')
@@ -126,7 +129,7 @@ function BibleParser() {
 							candidates.splice(i, 1);	
 							removed = true;		}					
 						break;
-					case 'h*':
+					case 'h*': //1 Peter 2 Peter
 						if (candidates[i].prefix == '1')
 							candidates[i].bookID = 67;
 						else if (candidates[i].prefix == '2')
@@ -137,7 +140,7 @@ function BibleParser() {
 						break;
 					case '22':
 					//Isaiah: if abbreviated to 'Is' (without a dot) and has no verse then discard to avoid ambiguous case: "she is 20 y/o."
-						if (candidates[i].book == 'Is' || 'is') {
+						if (candidates[i].book == 'Is' || candidates[i].book == 'is') {
 							if (candidates[i].ref.charAt(2) != '.' && !candidates[i].verse) {
 								candidates.splice(i, 1);
 								removed = true;
@@ -170,9 +173,13 @@ function BibleParser() {
 						}
 				}
 				if (!removed)	{
-					//re-assign long and short book names to allow for Normalization e.g. Leviticus Lev				
-					candidates[i].book = booksinfo[candidates[i].bookID-1].names[0]; 
-					candidates[i].bookshort = booksinfo[candidates[i].bookID-1].names[1];									
+					//re-assign long and short normalized book names  e.g. Leviticus Lev
+					
+					if (!normalizedNames[this.locale])  
+						this.locale = "en";					
+					
+					candidates[i].book =  normalizedNames[this.locale][candidates[i].bookID-1][0]; 
+					candidates[i].bookshort = normalizedNames[this.locale][candidates[i].bookID-1][1]; 
 				}
 			} else {
 				//if candidate book name wasn't found in aliases, then remove from array			
@@ -187,11 +194,11 @@ function BibleParser() {
 		 
 		for (var i = candidates.length -1; i >= 0 ; i--) {
 		
-			if (Number(candidates[i].chapter) > booksinfo[candidates[i].bookID-1].verses.length) {
+			if (Number(candidates[i].chapter) > booksinfo[candidates[i].bookID-1].length) {
 				//if chapter is greater than allowed, candidate should be removed.. but first check special cases:
 				//handle cases of books with only one chapter which can be omitted in favour of the verse e.g "Obadiah 9"	
 				if (stack.indexOf(candidates[i].bookID.toString()) != -1) {
-					if (candidates[i].verse == undefined && candidates[i].chapter <= booksinfo[candidates[i].bookID-1].verses[0]) {
+					if (candidates[i].verse == undefined && candidates[i].chapter <= booksinfo[candidates[i].bookID-1][0]) {
 						candidates[i].verse = candidates[i].chapter;
 						candidates[i].chapter = "1";																	
 					}
@@ -216,7 +223,7 @@ function BibleParser() {
 				
 				versenum = Number(versenum);
 			
-				if (versenum > booksinfo[candidates[i].bookID-1].verses[candidates[i].chapter -1]) { 
+				if (versenum > booksinfo[candidates[i].bookID-1][candidates[i].chapter -1]) { 
 						//remove from array							
 						candidates.splice(i, 1); }
 				else {
@@ -228,7 +235,7 @@ function BibleParser() {
 						
 						rangenum = Number(rangenum);						
 					
-					if (rangenum > booksinfo[candidates[i].bookID-1].verses[candidates[i].chapter -1] || rangenum <= versenum)
+					if (rangenum > booksinfo[candidates[i].bookID-1][candidates[i].chapter -1] || rangenum <= versenum)
 						candidates.splice(i, 1);
 					}					
 				}			
@@ -247,7 +254,7 @@ function BibleParser() {
 				for (var b = 0; b < extras.length ; b++) {
 					if (extras[b] != undefined && extras[b].length) {					
 					
-					if (extras[b] > booksinfo[candidates[i].bookID-1].verses[candidates[i].chapter -1]) 
+					if (extras[b] > booksinfo[candidates[i].bookID-1][candidates[i].chapter -1]) 
 						//remove from array							
 						toberemoved = true;		
 					}
@@ -272,7 +279,7 @@ function BibleParser() {
 		
 	if (candidates !== false) {
 	
-		var validated =	this.validateCandidates(candidates);	
+		var validated = this.validateCandidates(candidates);	
 		
 		if (validated.length) {
 			this.validRefs = validated;
@@ -284,6 +291,50 @@ function BibleParser() {
 	else 	
 		return false;
   };
+  this.normalizeRefs = function(stringToNormalize, lang, mode) {
+	  var old_vtype = this.vtype;	  
+	  this.vtype = "b";	  
+	  var normalizedNames = window.bp_normalizedNames;
+  	  
+	  if (lang && normalizedNames[lang])  
+			this.locale = lang;
+	  else this.locale = "en"; 
+
+	  if (mode == 0)
+		mode = "book";
+	  else 
+		mode = "bookshort";
+	  
+	  var candidates = this.grabCandidates(stringToNormalize);
+	  if (candidates !== false) {
+		var validated = this.validateCandidates(candidates);
+		var delta = 0;		
+		
+		for (var i = 0; i < validated.length; i++) {
+			var pos_ar = validated[i].pos.split('-');
+			var	diff = validated[i].ref.length;			
+						
+			var constructedRef = validated[i][mode] + " " + validated[i].chapter;
+			if (validated[i].verse)
+				constructedRef += ":" + validated[i].verse;
+			if (validated[i].rangeto)
+				constructedRef += "-" + validated[i].rangeto;
+			if (validated[i].addendum)
+				constructedRef += validated[i].addendum;							
+			
+			stringToNormalize = stringToNormalize.substr(0, Number(pos_ar[0]) + delta) +
+			constructedRef +
+			stringToNormalize.substr(Number(pos_ar[1]) + delta); 						
+			
+			if (constructedRef.length > diff)
+				delta += constructedRef.length - diff;
+			else if (constructedRef.length < diff)
+				delta -= diff - constructedRef.length;
+		}				
+	  }
+	  this.vtype = old_vtype;	  
+	  return stringToNormalize;	    	  
+  };   
   this.hasRefs = function() {	
 	return this.validRefs.length ? true : false;	
   };
@@ -295,19 +346,19 @@ function BibleParser() {
 		
 		var parsedResult, bookprefixnum;					
 		
-		parsedResult = this.validRefs.length + ' biblical refs have been found:' + '<br>';
+		parsedResult = '<strong>' + this.validRefs.length + ' biblical refs have been found:' + '</strong><br>';
 			
 		for (var i = 0; i < this.validRefs.length; i++) {		
-			bookprefixnum =	this.validRefs[i].prefix ? ', prefix: ' + this.validRefs[i].prefix : '';		
+			bookprefixnum =	this.validRefs[i].prefix ? ' | prefix: ' + this.validRefs[i].prefix : '';		
 			
-			parsedResult += i+1 + ': pos: ' + this.validRefs[i].pos + ', ref: ' + this.validRefs[i].ref + ', bookID: ' + this.validRefs[i].bookID +bookprefixnum + ', book: ' + this.validRefs[i].book  + ', bookshort: ' + this.validRefs[i].bookshort + ', chapter: ' + this.validRefs[i].chapter;
+			parsedResult += i+1 + ': pos: ' + this.validRefs[i].pos + ' | ref: ' + this.validRefs[i].ref + ' | bookID: ' + this.validRefs[i].bookID +bookprefixnum + ' | book: ' + this.validRefs[i].book  + ' | bookshort: ' + this.validRefs[i].bookshort + ' | chapter: ' + this.validRefs[i].chapter;
 			
 			if (this.validRefs[i].verse)
-				parsedResult +=  ', verse: ' + this.validRefs[i].verse;
+				parsedResult +=  ' | verse: ' + this.validRefs[i].verse;
 			if (this.validRefs[i].rangeto)
-				parsedResult +=  ', rangeto: ' + this.validRefs[i].rangeto;
+				parsedResult +=  ' | rangeto: ' + this.validRefs[i].rangeto;
 			if (this.validRefs[i].addendum)
-				parsedResult +=  ', addendum: ' + this.validRefs[i].addendum + '<br>';
+				parsedResult +=  ' | addendum: ' + this.validRefs[i].addendum + '<br>';
 			else				
 				parsedResult += '<br>';
 									
