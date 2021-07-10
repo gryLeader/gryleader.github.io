@@ -14,7 +14,7 @@ function BibleParser() {
     var match, 
 		matches = [];
 	//This regex does most of the job. You can learn more using https://regexr.com/ to understand how it works.		
-	var bigRegex = /(?:(\b[1-3])(?:[^\S\r\n]|[°stndar.]{1,3}[^\S\r\n]?)?)?([A-Za-zÀ-ÿ]{2,})(?:\.?_?[^\S\r\n]?)(\d+)(?:[:,]\s?(\d+[a-d]*))?(?:-(\d+[a-d]{0,5})([\d\.\-,a-d]*)?)?(?:(\.[\d\.\-,a-d]+|,[\d\.\-,a-d]+))?/g;	
+	var bigRegex = /(?:(\b[1-3])(?:[^\S\r\n]|[°stndar.]{1,3}[^\S\r\n])?)?([A-Za-zÀ-ÿ]{2,})(?:\.?_?[^\S\r\n]?)(\d+)(?:[:,]\s?(\d+[a-d]*))?(?:-(\d+[a-d]{0,5})([\d\.\-,a-d]*)?)?(?:(\.[\d\.\-,a-d]+|,[\d\.\-,a-d]+))?/g;	
 					
 	while (match = bigRegex.exec(astring)) {
 		var refObject = {
