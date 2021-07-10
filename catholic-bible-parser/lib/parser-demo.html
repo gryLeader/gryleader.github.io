@@ -11,7 +11,7 @@ a {cursor:pointer;font-size:11px;color:#253f8b;font-family:verdana,arial,sans-se
 a:hover {background:#c9d9eb;box-shadow:0 1px 2px #999999;font-style:italic;}
 .bibleref {background-color:#f4fbf8;font-style:italic;border-bottom:1px dashed #132353;}
 .bibleref:hover {background-color:#d5fdee;border-bottom:1px dotted #16285f;font-style:normal;cursor:pointer;}
-#time {font-size:13px;float:right;font-weight:bold;margin:0 15px 10px 0;color:#d30e0e;}
+#time {font-size:13px;font-weight:bold;margin:0 15px 10px 0;color:#d30e0e;}
 #para1 {padding:9px;clear:both;width:99%;line-height:20px;background:#f8fcfc;border-radius:6px;border:1px solid #dddddd}
 #para2 {color:#444444;font-size:12px;}
 #textarea1 {display:block;clear:both;height:40px;width:90%;margin:10px 0 0;}
@@ -118,8 +118,10 @@ function countchapters() {
 	<h1>Catholic Bible Reference Parser - Scripture Recognition Demo</h1>
 	<p style="font-size:11px;color:#444444;">This demo demonstrates recognizing of catholic bible references (73 books) in english and spanish language.<br>Note: The demo and the functions SUPPORT IE6+ (Wide browser compatibility).<br>To Use just press the Parse text button. You may also want to add your own references in the text area below for testing.
 	</p>	
-	<div style="margin:10px 0;width:100%">	
-		<p id="time">* Time: 0 ms</p>
+	<div style="margin:5px;text-align:right">
+	<p id="time">* Time: 0 ms</p>
+	</div>	
+	<div style="margin:10px 0;width:100%">		
 		<p id="para1">Genesis 2:21; Gen 24:34-37.38.56ab; (2 Mac. 15:36) Genesis 1:6,9-10. My friend is 5 years old, is. 5 Is 5 is 5:1 Is.4 Is. 3; Is 7:13 Hec_1:15-17.21.22) Mar 3:24 Mc 9:10a-34.36a.38c.50a r 1 Cr. 12:4 1Cr. 12:5  1Cr 13:6  1Cr. 14:15-16  1Cr. 15,17-23  Mt3,16 Mt. 5,16-18 Mt. 5,16-12 Mt.5,16ab (Mt. 5, 16a-18ab) 1st. Cor 3:21; 3° Jn. 1:13	2 Cr. 3:10 2Cr. 3,10 Ob 6565 yretyer 42423 The 10 commandments are awesome. mt 11:15 lc 4:1-23 Gen 24:25-31.33.35 Jn. 4:15-19; 5 Jn.3:27 3 Mt. 3:12,14,15 Tr. 3:5.7b Am. 1:12 Deut 6 2 Lev. 6, 29 1ra Tes 3:13 (spanish) 1st Thes 1:7 1Thes 3:02 Mk. 3-9; Song 2:4-6 Cantar 2:4-7. 
 		</p>
 		<p style="font-size:11px;color:#444444;font-style:italic;">* Time in milliseconds is calculated on Bible Reference Parser functions only, excluding operations executed later to show the results.
